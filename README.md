@@ -1,2 +1,2 @@
 # AlgoBioinf
-Repository some bioninformatics algorithms and methods.
+Repository with some bioninformatics algorithms and methods.
