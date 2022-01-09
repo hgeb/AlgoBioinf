@@ -22,26 +22,31 @@ class Error: #!ToDo: Add Error description
     Error class that acts as a base class for more specific errors.
     """
     
-    def __init__(self, name):
+    def __init__(self, name, details):
         self.name = name
+        self.details = details
+        
+    def __repr__(self):
+        return self.as_string()
+    
     def as_string(self):
-        result = f"{self.name}"
+        result = f"{self.name}\n{self.details}"
         return result
     
 class IllegalCharError(Error):
     """
     Error, when an illegal character is found in input.
     """
-    def __init__(self):
-        super().__init__("Illegal Character")
+    def __init__(self,details):
+        super().__init__("Illegal Character",details)
               
 
 class InvalidSyntaxError(Error):
     """
     Error, when a syntax error is found.
     """
-    def __init__(self):
-        super().__init__("Invalid Syntax")
+    def __init__(self, details):
+        super().__init__("Invalid Syntax",details)
 
 
 ###############################
@@ -126,7 +131,7 @@ class Lexer:
                 tokens.append(Token(TT_COMMA))
                 self.advance()
             else:
-                return [], IllegalCharError()
+                return [], IllegalCharError("Input contains illegal characters.")
         
         tokens.append(Token(TT_EOF))
         return tokens, None
@@ -264,8 +269,12 @@ class Parser():
         
         res = self.tree()
         
+        if res == None:
+            res = ParseResult()
+            return res.failure(InvalidSyntaxError("An error occured!"))
+        
         if not res.error and self.current_tok.type != TT_EOF:
-            return res.failure(InvalidSyntaxError())
+            return res.failure(InvalidSyntaxError("Parser does not reach end of file."))
         
         return res
     
@@ -294,10 +303,11 @@ class Parser():
             If an error occures, then the parse result will contain an error.
 
         """
-        
         res = ParseResult()
         
         tok = self.current_tok
+        
+        
         
         if tok.type == TT_INT:
             return self.leaf()
@@ -305,10 +315,12 @@ class Parser():
         elif tok.type == TT_LPAREN:
             self.advance()
             
+            
             left = self.subtree().node
             
             if self.current_tok.type == TT_COMMA:
                 self.advance()
+                
                 
                 right = self.subtree().node
                 
@@ -316,12 +328,19 @@ class Parser():
                     
                     self.advance()
                 else:
-                    return res.failure(InvalidSyntaxError())
+                    return res.failure(InvalidSyntaxError("Right parenthesis missing!"))
+            
             else:
-                return res.failure(InvalidSyntaxError())
+                return res.failure(InvalidSyntaxError("',' is missing!")) 
             
+            
+            if right == None or left == None:
+                return res.failure(InvalidSyntaxError("Leaf missing!"))
             return res.success(InternalNode(left, right))
-            
+        
+        else:
+            return res.failure(InvalidSyntaxError("Input has to start with '( or a number!"))
+
             
         
     def leaf(self):
@@ -332,6 +351,7 @@ class Parser():
             the ParseResult contains a LeafNode.
 
         """
+        
         res = ParseResult()
         tok = self.current_tok
         self.advance()
@@ -481,6 +501,8 @@ def run(text):
     lexer = Lexer(text)
     tokens, error = lexer.make_tokens()
     
+    if error: return None, error
+    
     #parse input
     parser = Parser(tokens)
     parseTree = parser.parse()
@@ -494,3 +516,17 @@ def run(text):
     
     return result, None
 
+def run2(text):
+    #tokenize input
+    lexer = Lexer(text)
+    tokens, error = lexer.make_tokens()
+    
+    if error: return None, error
+    
+    #parse input
+    parser = Parser(tokens)
+    parseTree = parser.parse()
+    
+    if parseTree.error: return None, parseTree.error
+    
+    return parseTree.node, None
