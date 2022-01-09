@@ -17,7 +17,7 @@ DIGITS = "0123456789"
 ### Errors
 ###############################
             
-class Error:
+class Error: #!ToDo: Add Error description
     """
     Error class that acts as a base class for more specific errors.
     """
