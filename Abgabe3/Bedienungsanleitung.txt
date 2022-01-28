@@ -1,0 +1,10 @@
+Das Programm zu dieser Programmieraufgabe ist mit Python geschrieben worden.
+Der Programmcode wurde in einem Jupyter Notebook geschrieben und die verschiedenen Fragestellungen wurden in dem Notebook beantwortet.
+Das Protokoll ist diesmal in dem gleichen Jupyter Notebook wie der Quellcode und wurde mit Markdown geschrieben (erster Teil des Notebooks).
+Um das Programm ausführen zu können, wird eine Entwicklungsumgebung wie
+JupyterLab oder JupyterNotebook benötigt, die .ipynb-Dateien lesen kann. Zur
+Ausführung des Programms werden außerdem folgende Python-Packages benötigt:
+• numpy
+• pandas
+• matplotlib.pyplot
+• re 
